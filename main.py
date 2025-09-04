@@ -1,7 +1,6 @@
 import ipaddress
 from rich.console import Console
 from rich.table import Table
-
 class RouterHash:
     def __init__(self, tam_usuario = 7):
         self.tamaño = tam_usuario
@@ -67,7 +66,6 @@ def validar_ip(ip):
         return True
     except ValueError:
         return False
-
 
 
 def menu():
