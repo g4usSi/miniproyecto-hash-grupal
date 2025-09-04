@@ -1,3 +1,7 @@
+import ipaddress
+from rich.console import Console
+from rich.table import Table
+
 class RouterHash:
     def __init__(self, tam_usuario = 7):
         self.tamaño = tam_usuario
@@ -42,24 +46,105 @@ class RouterHash:
             else:
                 print(f"Índice {i}: [Vacio]")
 
+    def mostrar_tabla2(self):
+        console = Console()
+        table = Table(title="Tabla Hash")
+        table.add_column("Índice", justify="center", style="cyan", no_wrap=True)
+        table.add_column("IP", style="green")
+        table.add_column("Interfaz", style="magenta")
 
-#SIMULACION EN CONSOLA
-router = RouterHash()
+        for i, entry in enumerate(self.tabla):
+            if entry:
+                table.add_row(str(i), entry[0], entry[1])
+            else:
+                table.add_row(str(i), "[italic red]Vacío[/]", "-")
 
-# Rutas iniciales
-router.agregar_ruta("192.168.1.1", "eth0")
-router.agregar_ruta("10.0.0.2", "eth1")
-router.agregar_ruta("172.16.5.10", "eth2")
-router.agregar_ruta("8.8.8.8", "eth3")
-router.agregar_ruta("192.168.1.99", "eth0")
+        console.print(table)
 
-# Mostrar tabla
-router.mostrar_tabla()
+def validar_ip(ip):
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        return False
 
-# Simulación de busqueda
-ip = "192.168.1.1"
-iface, idx = router.encontrar_ruta(ip)
-if iface:
-    print(f"\nPaquete destino {ip}: encontrado en indice {idx} → salida {iface}")
-else:
-    print(f"\nPaquete destino {ip}: no encontrado")
+
+
+def menu():
+    router = RouterHash(7)
+
+    while True:
+        print("\n--- MENÚ ROUTER HASH ---")
+        print("1. Agregar ruta")
+        print("2. Buscar ruta")
+        print("3. Eliminar ruta")
+        print("4. Mostrar tabla")
+        print("5. Simular paquete")
+        print("6. Salir")
+
+        try:
+            opcion = int(input("Seleccione una opción: "))
+        except ValueError:
+            print("¡ERROR! Ingresa un número válido.")
+            continue
+
+        match opcion:
+            case 1:
+                print("\n--- Agregar Ruta ---")
+                ip = input("Ingrese IP destino: ")
+                if not validar_ip(ip):
+                    print("¡ERROR! IP no válida.")
+                    continue
+                iface = input("Ingrese interfaz (ej. eth0): ")
+                router.agregar_ruta(ip, iface)
+                print("Ruta agregada.")
+            
+            case 2:
+                print("\n--- Buscar Ruta ---")
+                ip = input("Ingrese IP a buscar: ")
+                if not validar_ip(ip):
+                    print("¡ERROR! IP no válida.")
+                    continue
+                iface, idx = router.encontrar_ruta(ip)
+                if iface:
+                    print(f"IP {ip} encontrada en índice {idx} → {iface}")
+                else:
+                    print("Ruta no encontrada.")
+            
+            case 3:
+                print("\n--- Eliminar Ruta ---")
+                ip = input("Ingrese IP a eliminar: ")
+                if not validar_ip(ip):
+                    print("¡ERROR! IP no válida.")
+                    continue
+                iface, idx = router.encontrar_ruta(ip)
+                if iface:
+                    router.tabla[idx] = None
+                    print(f"Ruta {ip} eliminada.")
+                else:
+                    print("Ruta no encontrada.")
+            
+            case 4:
+                print("\n--- Mostrar Tabla ---")
+                router.mostrar_tabla2()
+            
+            case 5:
+                print("\n--- Simular Paquete ---")
+                ip = input("Ingrese IP destino del paquete: ")
+                if not validar_ip(ip):
+                    print("¡ERROR! IP no válida.")
+                    continue
+                iface, idx = router.encontrar_ruta(ip)
+                if iface:
+                    print(f"Paquete destino {ip} → salir por {iface}")
+                else:
+                    print(f"Paquete destino {ip} → DROP (no hay ruta)")
+            
+            case 6:
+                print("Saliendo del simulador...")
+                break
+            
+            case _:
+                print("¡ERROR! Opción no válida.")
+
+menu()
