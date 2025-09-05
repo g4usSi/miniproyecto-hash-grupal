@@ -81,7 +81,6 @@ def validar_ip(ip):
 
 def menu():
     router = RouterHash(7)
-
     while True:
         print("\n--- MENÚ ROUTER HASH ---")
         print("1. Agregar ruta")
@@ -156,5 +155,9 @@ def menu():
             case _:
                 print(f"{YELLOW}¡ERROR! Opción no válida.{RESET}")
 
-
+print("Integrantes:")
+print("Miguel René Montenegro Soto - 1554324")
+print("Henry Daniel Diaz Corado - 2455724")
+print("Justo Geovanny Alcon Mendoza - 1578324")
+print("María Leonor Rosales Gutiérrez - 1560124")
 menu()
